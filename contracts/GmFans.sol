@@ -57,8 +57,6 @@ contract TheGmFansStudio {
     enum CommissionStatus { queued, accepted, removed  }
 
     struct Shop {
-        address owner;
-        uint256 shopId;
         uint256 bid;
         uint256 tax;
     }
@@ -74,15 +72,17 @@ contract TheGmFansStudio {
 
 
     address payable public admin;
+    address payable public receiptentDao;
     
     mapping (uint => Commission) public commissions;
+    mapping (uint256 => Shop) public shops;
     
     //uint public minBid; // the number of wei required to create a commission
     uint public newCommissionIndex; // the index of the next commission which should be created in the mapping
     bool public callStarted; // ensures no re-entrancy can occur
 
     modifier callNotStarted () {
-      require(!callStarted);
+      require(!callStarted, "callNotStarted");
       callStarted = true;
       _;
       callStarted = false;
@@ -93,9 +93,9 @@ contract TheGmFansStudio {
         _;
     }
     
-    constructor(address payable _admin, uint _minBid) {
+    constructor(address payable _admin, address payable _receiptentDao) {
         admin = _admin;
-        //minBid = _minBid;
+        receiptentDao = _receiptentDao;
         newCommissionIndex = 1;
     }
     
@@ -109,29 +109,32 @@ contract TheGmFansStudio {
         emit AdminUpdated(_newAdmin);
     }
     
-    function updateMinBid (uint _newMinBid)
+    function updateMinBid (uint256 _shopId, uint256 _newMinBid)
     public
     callNotStarted
     onlyAdmin
     {
-        minBid = _newMinBid;
-        emit MinBidUpdated(_newMinBid);
+        Shop storage shop = shops[_shopId];
+        shop.bid = _newMinBid;
+        emit MinBidUpdated(_shopId, _newMinBid);
     }
    
-    function commission (string memory _id) 
+    function commission (string memory _id, uint256 _shopId) 
     public
     callNotStarted
     payable
-    {
-        require(msg.value >= minBid, "bid below minimum"); // must send the proper amount of into the bid
+    {   
+        Shop memory shop = shops[_shopId];
+        require(shop.bid != 0, "undefined shopId");
+        require(msg.value >= shop.bid, "bid below minimum"); // must send the proper amount of into the bid
         
         // Next, initialize the new commission
         Commission storage newCommission = commissions[newCommissionIndex];
-        newCommission.recipient = payable(msg.sender);
+        newCommission.recipient = receiptentDao;
         newCommission.bid = msg.value;
         newCommission.status = CommissionStatus.queued;
               
-        emit NewCommission(newCommissionIndex, _id, msg.value, msg.sender);
+        emit NewCommission(newCommissionIndex, _id, _shopId, msg.value, msg.sender);
         
         newCommissionIndex++; // for the subsequent commission to be added into the next slot 
     }
@@ -211,8 +214,8 @@ contract TheGmFansStudio {
     }
     
     event AdminUpdated(address _newAdmin);
-    event MinBidUpdated(uint _newMinBid);
-    event NewCommission(uint _commissionIndex, string _id, uint _bid, address _recipient);
+    event MinBidUpdated(uint256 _shopId, uint256 _newMinBid);
+    event NewCommission(uint _commissionIndex, string _id, uint256 _shopId, uint _bid, address _recipient);
     event CommissionBidUpdated(uint _commissionIndex, uint _newBid);
     event CommissionRescinded(uint _commissionIndex);
     event CommissionProcessed(uint _commissionIndex, CommissionStatus _status);
