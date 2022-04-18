@@ -57,13 +57,14 @@ contract TheGmFansStudio {
     enum CommissionStatus { queued, accepted, removed  }
 
     struct Shop {
-        uint256 bid;
+        uint256 minBid;
         uint256 tax;
     }
     
     struct Commission {
         address payable recipient;
-        Shop shop; 
+        uint256 shopId;
+        uint256 bid; 
         CommissionStatus status;
     }
 
@@ -115,7 +116,7 @@ contract TheGmFansStudio {
     onlyAdmin
     {
         Shop storage shop = shops[_shopId];
-        shop.bid = _newMinBid;
+        shop.minBid = _newMinBid;
         emit MinBidUpdated(_shopId, _newMinBid);
     }
    
@@ -125,21 +126,22 @@ contract TheGmFansStudio {
     payable
     {   
         Shop memory shop = shops[_shopId];
-        require(shop.bid != 0, "undefined shopId");
-        require(msg.value >= shop.bid, "bid below minimum"); // must send the proper amount of into the bid
+        require(shop.minBid != 0, "undefined shopId");
+        require(msg.value >= shop.minBid, "bid below minimum"); // must send the proper amount of into the bid
         
         // Next, initialize the new commission
         Commission storage newCommission = commissions[newCommissionIndex];
-        newCommission.recipient = receiptentDao;
+        newCommission.shopId = _shopId;
         newCommission.bid = msg.value;
         newCommission.status = CommissionStatus.queued;
+        newCommission.recipient = payable(msg.sender);
               
         emit NewCommission(newCommissionIndex, _id, _shopId, msg.value, msg.sender);
         
         newCommissionIndex++; // for the subsequent commission to be added into the next slot 
     }
     
-    function batchCommission (string[] memory _ids, uint[] memory _bids ) 
+    function batchCommission (string[] memory _ids, uint256[] memory _shopIds, uint256[] memory _bids ) 
     public
     callNotStarted
     payable
@@ -148,14 +150,18 @@ contract TheGmFansStudio {
         uint sum = 0;
         
         for (uint i = 0; i < _ids.length; i++){
-          require(_bids[i] >= minBid, "bid below minimum"); // must send the proper amount of into the bid
+          Shop memory shop = shops[_shopIds[i]];
+          require(shop.minBid != 0, "undefined shopId");
+          require(_bids[i] >= shop.minBid, "bid below minimum"); // must send the proper amount of into the bid
           // Next, initialize the new commission
           Commission storage newCommission = commissions[newCommissionIndex];
-          newCommission.recipient = payable(msg.sender);
+          newCommission.shopId = _shopIds[i];
           newCommission.bid = _bids[i];
           newCommission.status = CommissionStatus.queued;
+          newCommission.recipient = payable(msg.sender);
+
                 
-          emit NewCommission(newCommissionIndex, _ids[i], _bids[i], msg.sender);
+          emit NewCommission(newCommissionIndex, _ids[i], _shopIds[i], _bids[i], msg.sender);
           
           newCommissionIndex++; // for the subsequent commission to be added into the next slot 
           sum += _bids[i];
