@@ -69,18 +69,16 @@ contract TheGmFansStudio {
     }
 
 
-    uint MAX_INT = uint256(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff);
-
-
     address payable public admin;
     address payable public receiptentDao;
     
-    mapping (uint => Commission) public commissions;
+    mapping (uint256 => Commission) public commissions;
     mapping (uint256 => Shop) public shops;
     
-    //uint public minBid; // the number of wei required to create a commission
-    uint public newCommissionIndex; // the index of the next commission which should be created in the mapping
-    bool public callStarted; // ensures no re-entrancy can occur
+    //uint256public minBid; // the number of wei required to create a commission
+    uint256 public newCommissionIndex; // the index of the next commission which should be created in the mapping
+    uint256 public newShopIndex;
+    bool private callStarted; // ensures no re-entrancy can occur
 
     modifier callNotStarted () {
       require(!callStarted, "callNotStarted");
@@ -98,6 +96,7 @@ contract TheGmFansStudio {
         admin = _admin;
         receiptentDao = _receiptentDao;
         newCommissionIndex = 1;
+        newShopIndex = 1;
     }
     
      
@@ -141,36 +140,8 @@ contract TheGmFansStudio {
         newCommissionIndex++; // for the subsequent commission to be added into the next slot 
     }
     
-    function batchCommission (string[] memory _ids, uint256[] memory _shopIds, uint256[] memory _bids ) 
-    public
-    callNotStarted
-    payable
-    {
-        require(_ids.length == _bids.length, "arrays unequal length");
-        uint sum = 0;
-        
-        for (uint i = 0; i < _ids.length; i++){
-          Shop memory shop = shops[_shopIds[i]];
-          require(shop.minBid != 0, "undefined shopId");
-          require(_bids[i] >= shop.minBid, "bid below minimum"); // must send the proper amount of into the bid
-          // Next, initialize the new commission
-          Commission storage newCommission = commissions[newCommissionIndex];
-          newCommission.shopId = _shopIds[i];
-          newCommission.bid = _bids[i];
-          newCommission.status = CommissionStatus.queued;
-          newCommission.recipient = payable(msg.sender);
-
-                
-          emit NewCommission(newCommissionIndex, _ids[i], _shopIds[i], _bids[i], msg.sender);
-          
-          newCommissionIndex++; // for the subsequent commission to be added into the next slot 
-          sum += _bids[i];
-        }
-        
-        require(msg.value == sum, "insufficient funds"); // must send the proper amount of into the bid
-    }
     
-    function rescindCommission (uint _commissionIndex) 
+    function rescindCommission (uint256 _commissionIndex) 
     public
     callNotStarted
     {
@@ -183,10 +154,10 @@ contract TheGmFansStudio {
         selectedCommission.status = CommissionStatus.removed;
         selectedCommission.recipient.transfer(selectedCommission.bid);
         
-        emit CommissionRescinded(_commissionIndex);
+        emit CommissionRescinded(_commissionIndex, selectedCommission.bid);
     }
     
-    function increaseCommissionBid (uint _commissionIndex)
+    function increaseCommissionBid (uint256 _commissionIndex)
     public
     payable
     callNotStarted
@@ -197,17 +168,17 @@ contract TheGmFansStudio {
         require(selectedCommission.status == CommissionStatus.queued, "commission not in queue"); // the commission must still be queued
 
         // then we update the commission's bid
-        selectedCommission.bid = msg.value + selectedCommission.bid;
+        selectedCommission.bid =  selectedCommission.bid.add(msg.value);
         
-        emit CommissionBidUpdated(_commissionIndex, selectedCommission.bid);
+        emit CommissionBidUpdated(_commissionIndex, msg.value, selectedCommission.bid);
     }
     
-    function processCommissions(uint[] memory _commissionIndexes)
+    function processCommissions(uint256[] memory _commissionIndexes)
     public
     onlyAdmin
     callNotStarted
     {
-        for (uint i = 0; i < _commissionIndexes.length; i++){
+        for (uint256 i = 0; i < _commissionIndexes.length; i++){
             Commission storage selectedCommission = commissions[_commissionIndexes[i]];
             
             require(selectedCommission.status == CommissionStatus.queued, "commission not in the queue"); // the queue my not be empty when processing more commissions 
@@ -219,10 +190,26 @@ contract TheGmFansStudio {
         }
     }
     
+    function addShop(uint256 _minBid, uint256 _tax)
+    public
+    onlyAdmin
+    {
+
+      require(_minBid != 0, "minBid must not zero");
+      Shop storage shop = shops[newShopIndex];
+      shop.minBid = _minBid;
+      shop.tax = _tax;
+
+      emit ShopAdded(newCommissionIndex, _minBid,  _tax);
+      newShopIndex++;
+      
+    }
+
     event AdminUpdated(address _newAdmin);
     event MinBidUpdated(uint256 _shopId, uint256 _newMinBid);
-    event NewCommission(uint _commissionIndex, string _id, uint256 _shopId, uint _bid, address _recipient);
-    event CommissionBidUpdated(uint _commissionIndex, uint _newBid);
-    event CommissionRescinded(uint _commissionIndex);
-    event CommissionProcessed(uint _commissionIndex, CommissionStatus _status);
+    event NewCommission(uint256 _commissionIndex, string _id, uint256 _shopId, uint256 _bid, address _recipient);
+    event CommissionBidUpdated(uint256 _commissionIndex, uint256 _addedBid, uint256 _newBid);
+    event CommissionRescinded(uint256 _commissionIndex, uint256 _bid);
+    event CommissionProcessed(uint256 _commissionIndex, CommissionStatus _status);
+    event ShopAdded(uint256 _newCommissionIndex, uint256 _minBid, uint256 _tax);
 }
