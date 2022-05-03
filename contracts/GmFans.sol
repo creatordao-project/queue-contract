@@ -58,7 +58,8 @@ contract TheGmFansStudio {
 
     struct Shop {
         uint256 minBid;
-        uint256 tax;
+        uint256 tax; // e.g 50 represent for 5%
+        address payable owner;
     }
     
     struct Commission {
@@ -184,13 +185,20 @@ contract TheGmFansStudio {
             require(selectedCommission.status == CommissionStatus.queued, "commission not in the queue"); // the queue my not be empty when processing more commissions 
             
             selectedCommission.status = CommissionStatus.accepted; // first, we change the status of the commission to accepted
-            admin.transfer(selectedCommission.bid); // next we accept the payment for the commission
             
-            emit CommissionProcessed(_commissionIndexes[i], selectedCommission.status);
+            uint256 taxAmount = selectedCommission.bid.mul(shops[selectedCommission.shopId].tax).div(1000);
+
+            uint256 payAmount = selectedCommission.bid.sub(taxAmount);
+
+            receiptentDao.transfer(taxAmount);
+            
+            shops[selectedCommission.shopId].owner.transfer(payAmount); // next we accept the payment for the commission
+            
+            emit CommissionProcessed(_commissionIndexes[i], selectedCommission.status, taxAmount, payAmount);
         }
     }
     
-    function addShop(uint256 _minBid, uint256 _tax)
+    function addShop(uint256 _minBid, uint256 _tax, address _owner)
     public
     onlyAdmin
     {
@@ -199,8 +207,9 @@ contract TheGmFansStudio {
       Shop storage shop = shops[newShopIndex];
       shop.minBid = _minBid;
       shop.tax = _tax;
+      shop.owner = payable(_owner);
 
-      emit ShopAdded(newCommissionIndex, _minBid,  _tax);
+      emit NewShop(newShopIndex, _minBid,  _tax, _owner);
       newShopIndex++;
       
     }
@@ -210,6 +219,6 @@ contract TheGmFansStudio {
     event NewCommission(uint256 _commissionIndex, string _id, uint256 _shopId, uint256 _bid, address _recipient);
     event CommissionBidUpdated(uint256 _commissionIndex, uint256 _addedBid, uint256 _newBid);
     event CommissionRescinded(uint256 _commissionIndex, uint256 _bid);
-    event CommissionProcessed(uint256 _commissionIndex, CommissionStatus _status);
-    event ShopAdded(uint256 _newCommissionIndex, uint256 _minBid, uint256 _tax);
+    event CommissionProcessed(uint256 _commissionIndex, CommissionStatus _status, uint256 taxAmount, uint256 payAmount);
+    event NewShop(uint256 _newShopIndex, uint256 _minBid, uint256 _tax, address owner);
 }
