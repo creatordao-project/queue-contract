@@ -2,6 +2,8 @@ pragma solidity ^0.8.2;
 
 // SPDX-License-Identifier: MIT
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
 
 
 library SafeMath {
@@ -50,7 +52,7 @@ library SafeMath {
   }
 }
 
-contract TheGmFansStudio {
+contract CreatorDAOCommission is Initializable{
     
     using SafeMath for uint256;
     
@@ -93,7 +95,7 @@ contract TheGmFansStudio {
         _;
     }
     
-    constructor(address payable _admin, address payable _receiptentDao) {
+    function initialize(address payable _admin, address payable _receiptentDao) public initializer {
         admin = _admin;
         receiptentDao = _receiptentDao;
         newCommissionIndex = 1;
