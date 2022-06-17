@@ -21,15 +21,16 @@ async function main() {
   await greeter.deployed();
   console.log("CreatorDAOCommission deployed to:", greeter.address);
 
-
-  const instance = await upgrades.deployBeaconProxy(greeter, Greeter, [deployer.address, deployer.address]);
+  const instance = await upgrades.deployBeaconProxy(greeter, Greeter, [
+    deployer.address,
+    deployer.address,
+  ]);
 
   // const greeter = await Greeter.deploy(deployer.address, deployer.address);
 
   await instance.deployed();
 
   // const greeter = await ethers.getContractFactory("CreatorDAOCommission");
-
 
   console.log("BeaconProxy deployed to:", instance.address);
 }

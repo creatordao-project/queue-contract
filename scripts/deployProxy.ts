@@ -15,16 +15,14 @@ async function main() {
 
   // We get the contract to deploy
   const [deployer] = await ethers.getSigners();
+  const dao = "0x4a44a94dFcd91d6A269fEF0F167133f3231A7338";
   console.log(deployer.address);
   const Greeter = await ethers.getContractFactory("CreatorDAOCommission");
-  const proxy = await upgrades.deployProxy( Greeter, [deployer.address, deployer.address]);
+  const proxy = await upgrades.deployProxy(Greeter, [deployer.address, dao]);
   await proxy.deployed();
   console.log("CreatorDAOCommission deployed to:", proxy.address);
 
-
   // const greeter = await Greeter.deploy(deployer.address, deployer.address);
-
-
 }
 
 // We recommend this pattern to be able to use async/await everywhere
