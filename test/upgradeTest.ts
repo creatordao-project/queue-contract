@@ -195,12 +195,43 @@ describe("TheGmFansStudio", function () {
 
     await expect((await gmFansv1_1.commissions(6)).status).to.eq(2);
 
+    await expect((await gmFansv1_1.commissions(4)).status).to.eq(3);
+
+    await expect(
+      gmFans
+        .connect(usr)
+        .commission("hi", 1, { value: ethers.utils.parseEther("1") })
+    )
+      .to.emit(gmFans, "NewCommission")
+      .withArgs("7", "hi", "1", ethers.utils.parseEther("1"), usr.address);
+
+    await expect(
+      gmFans
+        .connect(usr)
+        .commission("hi", 1, { value: ethers.utils.parseEther("1") })
+    )
+      .to.emit(gmFans, "NewCommission")
+      .withArgs("8", "hi", "1", ethers.utils.parseEther("1"), usr.address);
+
+    console.log("batch process test");
+    await expect(gmFansv1_1.connect(artist).processCommissions([7, 8]))
+      .to.emit(gmFansv1_1, "CommissionProcessed")
+      .withArgs("7", 1);
+    await expect((await gmFansv1_1.commissions(7)).status).to.eq(1);
+    await expect((await gmFansv1_1.commissions(8)).status).to.eq(1);
+
+    // admin settle comission
+    await expect(
+      await gmFansv1_1.connect(admin).settleCommissions([7, 8])
+    ).to.changeEtherBalance(artist, ethers.utils.parseEther("1.9"));
+
+    await expect((await gmFansv1_1.commissions(7)).status).to.eq(3);
+    await expect((await gmFansv1_1.commissions(8)).status).to.eq(3);
+
     await expect(
       await gmFansv1_1.connect(artist).updateShopOwner(1, admin.address)
     )
       .to.emit(gmFansv1_1, "OwnerUpdated")
       .withArgs("1", admin.address);
-
-    await expect((await gmFansv1_1.commissions(4)).status).to.eq(3);
   });
 });
