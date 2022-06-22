@@ -1,0 +1,537 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x70e5CDFAc32e3feDB43761C3655987DF42b76866",
+    "txHash": "0x1091125d93c725bf4ea08698934e5c62761db98160da64e7e79c22e6e571b3e6"
+  },
+  "proxies": [
+    {
+      "address": "0x28661723731Bd8703044B2Bf18Ea790Ea0F5536c",
+      "txHash": "0xc362d1d7d16a00b3ad2c0d1ee6beb2949f519516089a4e2d3642439937ac3751",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x87836BcdacB9ecE80027ecb70BAFd469e8874ca8",
+      "txHash": "0x5de0105d2b6b8f8b788629cdd2188131938bd5dc1da2d7f1ea4a5ccf143278c6",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA23f34dc40515Ad4202074ff1682c008862EFF0F",
+      "txHash": "0x4891e566bd63df58d501bb4ba909bc47ba7f5207fbc705b5d7c998cc15f8daa0",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "ba7bf78464a99066d9df160c25c22a17cc03bc7152b64451ba8280b4d0953ce4": {
+      "address": "0xAE1C4357F85baE552e3e436726552Cf04Ff5d86b",
+      "txHash": "0x09be8cef99fb3936b3a5f86a9149da2ebc12ceb071a25306ecd3c95b9c45fac2",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "admin",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_address_payable",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/GmFans.sol:75"
+          },
+          {
+            "label": "receiptentDao",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_address_payable",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/GmFans.sol:76"
+          },
+          {
+            "label": "commissions",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_uint256,t_struct(Commission)509_storage)",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/GmFans.sol:78"
+          },
+          {
+            "label": "shops",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_mapping(t_uint256,t_struct(Shop)499_storage)",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/GmFans.sol:79"
+          },
+          {
+            "label": "newCommissionIndex",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/GmFans.sol:82"
+          },
+          {
+            "label": "newShopIndex",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/GmFans.sol:83"
+          },
+          {
+            "label": "callStarted",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_bool",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/GmFans.sol:84"
+          }
+        ],
+        "types": {
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_enum(CommissionStatus)492": {
+            "label": "enum CreatorDAOCommission.CommissionStatus",
+            "members": [
+              "queued",
+              "accepted",
+              "removed"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_uint256,t_struct(Commission)509_storage)": {
+            "label": "mapping(uint256 => struct CreatorDAOCommission.Commission)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Shop)499_storage)": {
+            "label": "mapping(uint256 => struct CreatorDAOCommission.Shop)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Commission)509_storage": {
+            "label": "struct CreatorDAOCommission.Commission",
+            "members": [
+              {
+                "label": "recipient",
+                "type": "t_address_payable",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "shopId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "bid",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(CommissionStatus)492",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          },
+          "t_struct(Shop)499_storage": {
+            "label": "struct CreatorDAOCommission.Shop",
+            "members": [
+              {
+                "label": "minBid",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "tax",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "owner",
+                "type": "t_address_payable",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "98744281bf063cb08258f22ac173335fde8d6dd0c54afa7f4ad121b66e895417": {
+      "address": "0x3CEDF2CF3b58729f6488EcAe2cd75FeD7d9137DB",
+      "txHash": "0x39f439d3ae51ea7df3bf6a411d21255484f59315534bb4d2a0e1c640a2a8f797",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "admin",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_address_payable",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/CreatorDAOCommission.sol:27"
+          },
+          {
+            "label": "recipientDao",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_address_payable",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/CreatorDAOCommission.sol:28"
+          },
+          {
+            "label": "commissions",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_uint256,t_struct(Commission)410_storage)",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/CreatorDAOCommission.sol:30"
+          },
+          {
+            "label": "shops",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_mapping(t_uint256,t_struct(Shop)400_storage)",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/CreatorDAOCommission.sol:31"
+          },
+          {
+            "label": "newCommissionIndex",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/CreatorDAOCommission.sol:34"
+          },
+          {
+            "label": "newShopIndex",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/CreatorDAOCommission.sol:35"
+          },
+          {
+            "label": "callStarted",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_bool",
+            "contract": "CreatorDAOCommission",
+            "src": "contracts/CreatorDAOCommission.sol:36"
+          }
+        ],
+        "types": {
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_enum(CommissionStatus)393": {
+            "label": "enum CreatorDAOCommission.CommissionStatus",
+            "members": [
+              "queued",
+              "accepted",
+              "removed"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_uint256,t_struct(Commission)410_storage)": {
+            "label": "mapping(uint256 => struct CreatorDAOCommission.Commission)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Shop)400_storage)": {
+            "label": "mapping(uint256 => struct CreatorDAOCommission.Shop)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Commission)410_storage": {
+            "label": "struct CreatorDAOCommission.Commission",
+            "members": [
+              {
+                "label": "recipient",
+                "type": "t_address_payable",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "shopId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "bid",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(CommissionStatus)393",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          },
+          "t_struct(Shop)400_storage": {
+            "label": "struct CreatorDAOCommission.Shop",
+            "members": [
+              {
+                "label": "minBid",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "tax",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "owner",
+                "type": "t_address_payable",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "6163563d596f395ce8af28e2c53de820a77bfd90ba78550363fa3ac51c10feaa": {
+      "address": "0x1EF8A0F2d05dc55012aD36f67eDF2530bb9ab131",
+      "txHash": "0xb847420a84a615a7551d203afb11b351626e3d2fe8315873cef9156672c82c4f",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "admin",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_address_payable",
+            "contract": "CreatorDAOCommissionV1_1",
+            "src": "contracts/CreatorDAOCommissionV1_1.sol:28"
+          },
+          {
+            "label": "recipientDao",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_address_payable",
+            "contract": "CreatorDAOCommissionV1_1",
+            "src": "contracts/CreatorDAOCommissionV1_1.sol:29"
+          },
+          {
+            "label": "commissions",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_uint256,t_struct(Commission)411_storage)",
+            "contract": "CreatorDAOCommissionV1_1",
+            "src": "contracts/CreatorDAOCommissionV1_1.sol:31"
+          },
+          {
+            "label": "shops",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_mapping(t_uint256,t_struct(Shop)401_storage)",
+            "contract": "CreatorDAOCommissionV1_1",
+            "src": "contracts/CreatorDAOCommissionV1_1.sol:32"
+          },
+          {
+            "label": "newCommissionIndex",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "CreatorDAOCommissionV1_1",
+            "src": "contracts/CreatorDAOCommissionV1_1.sol:35"
+          },
+          {
+            "label": "newShopIndex",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256",
+            "contract": "CreatorDAOCommissionV1_1",
+            "src": "contracts/CreatorDAOCommissionV1_1.sol:36"
+          },
+          {
+            "label": "callStarted",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_bool",
+            "contract": "CreatorDAOCommissionV1_1",
+            "src": "contracts/CreatorDAOCommissionV1_1.sol:37"
+          }
+        ],
+        "types": {
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_enum(CommissionStatus)394": {
+            "label": "enum CreatorDAOCommissionV1_1.CommissionStatus",
+            "members": [
+              "queued",
+              "accepted",
+              "removed",
+              "finished"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_uint256,t_struct(Commission)411_storage)": {
+            "label": "mapping(uint256 => struct CreatorDAOCommissionV1_1.Commission)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Shop)401_storage)": {
+            "label": "mapping(uint256 => struct CreatorDAOCommissionV1_1.Shop)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Commission)411_storage": {
+            "label": "struct CreatorDAOCommissionV1_1.Commission",
+            "members": [
+              {
+                "label": "recipient",
+                "type": "t_address_payable",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "shopId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "bid",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(CommissionStatus)394",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          },
+          "t_struct(Shop)401_storage": {
+            "label": "struct CreatorDAOCommissionV1_1.Shop",
+            "members": [
+              {
+                "label": "minBid",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "tax",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "owner",
+                "type": "t_address_payable",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    }
+  }
+}
