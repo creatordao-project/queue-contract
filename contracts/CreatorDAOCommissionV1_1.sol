@@ -3,49 +3,17 @@ pragma solidity ^0.8.2;
 // SPDX-License-Identifier: MIT
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "./CommissionStorage.sol";
+import "./RoleControl.sol";
 
-contract CreatorDAOCommissionV1_1 is Initializable {
-    enum CommissionStatus {
-        queued,
-        accepted,
-        removed,
-        finished
-    }
 
-    struct Shop {
-        uint256 minBid;
-        uint256 tax; // e.g 50 represent for 5%
-        address payable owner;
-    }
-
-    struct Commission {
-        address payable recipient;
-        uint256 shopId;
-        uint256 bid;
-        CommissionStatus status;
-    }
-
-    address payable public admin;
-    address payable public recipientDao;
-
-    mapping(uint256 => Commission) public commissions;
-    mapping(uint256 => Shop) public shops;
-
-    //uint256public minBid; // the number of wei required to create a commission
-    uint256 public newCommissionIndex; // the index of the next commission which should be created in the mapping
-    uint256 public newShopIndex;
-    bool private callStarted; // ensures no re-entrancy can occur
+contract CreatorDAOCommissionV1_1 is RoleControl {
 
     modifier callNotStarted() {
         require(!callStarted, "callNotStarted");
         callStarted = true;
         _;
         callStarted = false;
-    }
-
-    modifier onlyAdmin() {
-        require(msg.sender == admin, "not an admin");
-        _;
     }
 
     function initialize(address payable _admin, address payable _recipientDao)
@@ -58,14 +26,7 @@ contract CreatorDAOCommissionV1_1 is Initializable {
         newShopIndex = 1;
     }
 
-    function updateAdmin(address payable _newAdmin)
-        public
-        callNotStarted
-        onlyAdmin
-    {
-        admin = _newAdmin;
-        emit AdminUpdated(_newAdmin);
-    }
+
 
     function updateTaxRecipient(address payable _newRecipientDao)
         public
@@ -78,7 +39,7 @@ contract CreatorDAOCommissionV1_1 is Initializable {
     function updateMinBid(uint256 _shopId, uint256 _newMinBid)
         public
         callNotStarted
-        onlyAdmin
+        onlyOp
     {
         Shop storage shop = shops[_shopId];
         shop.minBid = _newMinBid;
@@ -89,9 +50,19 @@ contract CreatorDAOCommissionV1_1 is Initializable {
         public
     {
         Shop storage shop = shops[_shopId];
-        require(shop.owner == msg.sender, "only old owner could set new owner");
+        require(shop.owner == msg.sender || isOp(msg.sender), "only old owner could set new owner");
         shop.owner = _newOwner;
         emit OwnerUpdated(_shopId, _newOwner);
+    }
+
+     function updateAdmin(address payable _newAdmin)
+        public
+        callNotStarted
+        
+    {
+        require(msg.sender == admin, "not an admin");
+        admin = _newAdmin;
+        emit AdminUpdated(_newAdmin);
     }
 
     function commission(string memory _id, uint256 _shopId)
@@ -183,7 +154,7 @@ contract CreatorDAOCommissionV1_1 is Initializable {
             );
 
             require(
-                msg.sender == shops[selectedCommission.shopId].owner,
+                msg.sender == shops[selectedCommission.shopId].owner || isOp(msg.sender),
                 "Only shop owner could accept commission"
             );
 
@@ -265,7 +236,7 @@ contract CreatorDAOCommissionV1_1 is Initializable {
         uint256 _minBid,
         uint256 _tax,
         address _owner
-    ) public onlyAdmin {
+    ) public  OnlyOp{
         require(_minBid != 0, "minBid must not zero");
         require(_tax < 1000, "tax too high");
         Shop storage shop = shops[newShopIndex];
