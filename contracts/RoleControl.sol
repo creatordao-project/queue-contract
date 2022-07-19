@@ -1,22 +1,20 @@
-pragma solidity ^0.8.4;
 
-// Import the OpenZeppelin AccessControl contract
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./CommissionStorage.sol";
+import "./ERC2771Context.sol";
 
-// create a contract that extends the OpenZeppelin AccessControl contract
-contract RoleControl is Initializable,   CreatorDAOCommissionStorage, AccessControl {
-  // We can create as many roles as we want
-  // We use keccak256 to create a hash that identifies this constant in the contract
-  bytes32 public constant OP_ROLE = keccak256("OPERATOR"); // hash a USER as a role constant
 
-  // Constructor of the RoleControl contract
+pragma solidity ^0.8.0;
+
+contract RoleControl is Initializable,   CreatorDAOCommissionStorage, ERC2771Context {
+
+  
+
   function setRoot (address root) public  {
-    require(msg.sender == admin, "not an admin");
+    require(_msgSender() == admin, "not an admin");
 
     // NOTE: Other DEFAULT_ADMIN's can remove other admins, give this role with great care
-    _setupRole(DEFAULT_ADMIN_ROLE, root); // The creator of the contract is the default admin
+    _setupRole(DEFAULT_ADMIN_ROLE, root); 
 
     _setRoleAdmin(OP_ROLE, DEFAULT_ADMIN_ROLE);
   }
@@ -30,8 +28,8 @@ contract RoleControl is Initializable,   CreatorDAOCommissionStorage, AccessCont
   // Create a modifier that can be used in other contract to make a pre-check
   // That makes sure that the sender of the transaction (msg.sender)  is a admin
   modifier onlyAdmin() {
-    require(isAdmin(msg.sender), "Restricted to admins.");
-      _;
+    require(isAdmin(_msgSender()), "Restricted to admins.");
+      _; 
   }
 
   // Add a user address as a admin
@@ -49,7 +47,7 @@ contract RoleControl is Initializable,   CreatorDAOCommissionStorage, AccessCont
   // Create a modifier that can be used in other contract to make a pre-check
   // That makes sure that the sender of the transaction (msg.sender)  is a admin
   modifier onlyOp() {
-    require(isOp(msg.sender), "Restricted to OP.");
+    require(isOp(_msgSender()), "Restricted to OP.");
       _;
   }
 
@@ -60,5 +58,8 @@ contract RoleControl is Initializable,   CreatorDAOCommissionStorage, AccessCont
   }
 
 
+  function setTrustedForwarder(address trustedForwarder) public override virtual onlyAdmin {
+        _trustedForwarder = trustedForwarder;
+    }
 
 }

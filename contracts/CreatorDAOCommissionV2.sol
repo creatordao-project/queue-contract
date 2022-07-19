@@ -1,13 +1,12 @@
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.0;
 
 // SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./CommissionStorage.sol";
+
 import "./RoleControl.sol";
 
 
-contract CreatorDAOCommissionV1_1 is RoleControl {
+contract CreatorDAOCommissionV2 is RoleControl {
 
     modifier callNotStarted() {
         require(!callStarted, "callNotStarted");
@@ -236,7 +235,7 @@ contract CreatorDAOCommissionV1_1 is RoleControl {
         uint256 _minBid,
         uint256 _tax,
         address _owner
-    ) public  OnlyOp{
+    ) public  onlyOp{
         require(_minBid != 0, "minBid must not zero");
         require(_tax < 1000, "tax too high");
         Shop storage shop = shops[newShopIndex];

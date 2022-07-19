@@ -1,4 +1,5 @@
-pragma solidity ^0.8.2;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
 contract CreatorDAOCommissionStorage {
     enum CommissionStatus {
