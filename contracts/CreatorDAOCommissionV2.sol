@@ -45,11 +45,21 @@ contract CreatorDAOCommissionV2 is RoleControl {
         emit MinBidUpdated(_shopId, _newMinBid);
     }
 
+    function updateTax(uint256 _shopId, uint256 _tax)
+        public
+        callNotStarted
+    {       
+        Shop storage shop = shops[_shopId];
+        require(shop.owner == _msgSender() || isOp(_msgSender()), "only owner could update tax");
+        shop.tax = _tax;
+        emit TaxUpdated(_shopId, _tax);
+    }
+
     function updateShopOwner(uint256 _shopId, address payable _newOwner)
         public
     {
         Shop storage shop = shops[_shopId];
-        require(shop.owner == msg.sender || isOp(msg.sender), "only old owner could set new owner");
+        require(shop.owner == _msgSender() || isOp(_msgSender()), "only old owner could set new owner");
         shop.owner = _newOwner;
         emit OwnerUpdated(_shopId, _newOwner);
     }
@@ -59,7 +69,7 @@ contract CreatorDAOCommissionV2 is RoleControl {
         callNotStarted
         
     {
-        require(msg.sender == admin, "not an admin");
+        require(_msgSender() == admin, "not an admin");
         admin = _newAdmin;
         emit AdminUpdated(_newAdmin);
     }
@@ -78,14 +88,14 @@ contract CreatorDAOCommissionV2 is RoleControl {
         newCommission.shopId = _shopId;
         newCommission.bid = msg.value;
         newCommission.status = CommissionStatus.queued;
-        newCommission.recipient = payable(msg.sender);
+        newCommission.recipient = payable(_msgSender());
 
         emit NewCommission(
             newCommissionIndex,
             _id,
             _shopId,
             msg.value,
-            msg.sender
+            _msgSender()
         );
 
         newCommissionIndex++; // for the subsequent commission to be added into the next slot
@@ -94,7 +104,7 @@ contract CreatorDAOCommissionV2 is RoleControl {
     function rescindCommission(uint256 _commissionIndex) public callNotStarted {
         Commission storage selectedCommission = commissions[_commissionIndex];
         require(
-            msg.sender == selectedCommission.recipient,
+            _msgSender() == selectedCommission.recipient,
             "Only recipient could rescind"
         ); // may only be performed by the person who commissioned it
         require(
@@ -119,7 +129,7 @@ contract CreatorDAOCommissionV2 is RoleControl {
     {
         Commission storage selectedCommission = commissions[_commissionIndex];
         require(
-            msg.sender == selectedCommission.recipient,
+            _msgSender() == selectedCommission.recipient,
             "commission not yours"
         ); // may only be performed by the person who commissioned it
         require(
@@ -153,7 +163,7 @@ contract CreatorDAOCommissionV2 is RoleControl {
             );
 
             require(
-                msg.sender == shops[selectedCommission.shopId].owner || isOp(msg.sender),
+                _msgSender() == shops[selectedCommission.shopId].owner || isOp(_msgSender()),
                 "Only shop owner could accept commission"
             );
 
@@ -168,7 +178,6 @@ contract CreatorDAOCommissionV2 is RoleControl {
 
     function settleCommissions(uint256[] memory _commissionIndexes)
         public
-        onlyAdmin
         callNotStarted
     {
         uint256 totalTaxAmount = 0;
@@ -182,7 +191,7 @@ contract CreatorDAOCommissionV2 is RoleControl {
                 selectedCommission.status == CommissionStatus.accepted,
                 "commission not in the queue"
             );
-
+            require(selectedCommission.recipient == _msgSender() || isAdmin(_msgSender()), "only commission owner cloud settle it:)");
             selectedCommission.status = CommissionStatus.finished; // first, we change the status of the commission to accepted
 
             uint256 taxAmount = (selectedCommission.bid *
@@ -279,4 +288,8 @@ contract CreatorDAOCommissionV2 is RoleControl {
         address owner
     );
     event OwnerUpdated(uint256 _shopId, address _newOwner);
+    event TaxUpdated(
+        uint256 _shopId,
+        uint256 _tax
+    );
 }
